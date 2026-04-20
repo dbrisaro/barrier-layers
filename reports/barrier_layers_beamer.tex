@@ -1,0 +1,510 @@
+%% Barrier Layer Depth -- Beamer presentation
+%% Compile: pdflatex barrier_layers_beamer.tex
+\documentclass[aspectratio=169, 12pt]{beamer}
+
+%% ── Encoding & language ───────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+
+%% ── Packages ──────────────────────────────────────────────────────────────────
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{colortbl}
+
+%% ── Colors ────────────────────────────────────────────────────────────────────
+\definecolor{oceanblue}{HTML}{065A82}
+\definecolor{deepnavy}{HTML}{1C2951}
+\definecolor{iceblue}{HTML}{CADCFC}
+\definecolor{teal}{HTML}{1C7293}
+\definecolor{lightgray}{HTML}{F4F4F4}
+
+%% ── Theme ─────────────────────────────────────────────────────────────────────
+\usetheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{%
+  \hfill\usebeamerfont{footline}\insertframenumber\,/\,\inserttotalframenumber\hspace{4pt}\vspace{4pt}%
+}
+
+\setbeamercolor{frametitle}{fg=white, bg=oceanblue}
+\setbeamerfont{frametitle}{size=\large, series=\bfseries}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{subtitle}{fg=iceblue}
+\setbeamercolor{author}{fg=iceblue}
+\setbeamercolor{date}{fg=iceblue}
+\setbeamercolor{normal text}{fg=black}
+\setbeamercolor{structure}{fg=oceanblue}
+\setbeamercolor{block title}{fg=white, bg=oceanblue}
+\setbeamercolor{block body}{bg=lightgray}
+\setbeamertemplate{itemize item}{\color{oceanblue}\textbullet}
+\setbeamertemplate{itemize subitem}{\color{teal}--}
+
+%% ── Helper: section divider frame ─────────────────────────────────────────────
+\newcommand{\sectionframe}[1]{%
+  \begin{frame}[plain, noframenumbering]
+    \begin{tikzpicture}[remember picture, overlay]
+      \fill[deepnavy] (current page.south west) rectangle (current page.north east);
+      \node[text=white, font=\LARGE\bfseries, align=center]
+        at (current page.center) {#1};
+    \end{tikzpicture}
+  \end{frame}
+}
+
+%% ── Helper: full-slide image ──────────────────────────────────────────────────
+\newcommand{\fullimg}[1]{%
+  \includegraphics[width=\textwidth, height=0.73\textheight, keepaspectratio]{#1}%
+}
+
+%% ── Caption style ─────────────────────────────────────────────────────────────
+\newcommand{\captext}[1]{%
+  \vskip2pt
+  {\footnotesize\color{gray} #1}%
+}
+
+%% ── Title info ────────────────────────────────────────────────────────────────
+\title{Barrier Layer Depth: Análisis Global 1993--2024}
+\subtitle{Sensibilidad al método, comparación LR vs HR,\\tendencias y variabilidad interanual}
+\date{2026}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+\begin{document}
+
+%% ── TITLE ─────────────────────────────────────────────────────────────────────
+{
+\setbeamercolor{background canvas}{bg=deepnavy}
+\begin{frame}[plain]
+  \vfill
+  \centering
+  {\color{white}\Large\textbf{Barrier Layer Depth: Análisis Global 1993--2024}}\\[10pt]
+  {\color{iceblue}\normalsize Sensibilidad al método, comparación LR vs HR,\\
+  tendencias y variabilidad interanual}\\[30pt]
+  {\color{iceblue}\small 2026}
+  \vfill
+\end{frame}
+}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+\sectionframe{1. Física de la Barrier Layer}
+
+%% ── Qué es la Barrier Layer ──────────────────────────────────────────────────
+\begin{frame}{¿Qué es la Barrier Layer?}
+\begin{columns}[c]
+
+\column{0.52\textwidth}
+\centering
+\begin{tikzpicture}[scale=1.05]
+  %% ── ocean column (x: 0..2, y: 0..6) ─────────────────────
+  \fill[cyan!10]      (0,5.4) rectangle (2.0,6.0); % surface
+  \fill[cyan!25]      (0,3.6) rectangle (2.0,5.4); % MLD
+  \fill[teal!45]      (0,2.0) rectangle (2.0,3.6); % BLD  ← resaltado
+  \fill[blue!60]      (0,0.0) rectangle (2.0,2.0); % thermocline
+  %% ── boundaries ───────────────────────────────────────────
+  \draw[white, line width=1.2pt] (0,5.4) -- (2.0,5.4);
+  \draw[white, dashed, line width=1pt] (0,3.6) -- (2.0,3.6);
+  \draw[white, line width=1.2pt] (0,2.0) -- (2.0,2.0);
+  \draw[gray!40, thin] (0,0) rectangle (2.0,6.0);
+  %% ── depth brackets (left) ────────────────────────────────
+  \draw[<->, thick, black!50]
+    (-0.25,3.6) -- (-0.25,5.4) node[midway,left,font=\scriptsize]{MLD};
+  \draw[<->, thick, black!40]
+    (-0.25,2.0) -- (-0.25,5.4) node[midway,left=3pt,font=\scriptsize,xshift=-4pt]{ILD};
+  \draw[<->, very thick, teal]
+    (-0.75,2.0) -- (-0.75,3.6)
+    node[midway,left,font=\small\bfseries,color=teal]{BLD};
+  %% ── right labels ─────────────────────────────────────────
+  \node[right,font=\small\itshape]             at (2.2,5.70){Superficie};
+  \node[right,font=\small\bfseries]            at (2.2,4.60){Capa de Mezcla};
+  \node[right,font=\scriptsize,color=gray]     at (2.2,4.30){isohalina e isotérmica};
+  \node[right,font=\small\bfseries,color=teal] at (2.2,2.90){Barrier Layer};
+  \node[right,font=\scriptsize,color=gray]     at (2.2,2.60){fresca y cálida};
+  \node[right,font=\scriptsize,color=gray]     at (2.2,2.30){estratif.\ salina};
+  \node[right,font=\small\bfseries]            at (2.2,1.00){Termoclina};
+\end{tikzpicture}
+
+\column{0.45\textwidth}
+\begin{block}{Definición}
+\[ \text{BLD} = \text{ILD} - \text{MLD} \]
+\end{block}
+\vspace{6pt}
+{\small
+\begin{itemize}
+  \item \textbf{BLD $>$ 0}: Barrier Layer presente
+  \item \textbf{BLD $=$ 0}: ILD coincide con MLD
+\end{itemize}
+\vspace{8pt}
+La BLD \textbf{inhibe el intercambio de calor} entre la superficie y la termoclina, modulando la SST y el acoplamiento océano-atmósfera.
+}
+\end{columns}
+\end{frame}
+
+%% ── Regiones ─────────────────────────────────────────────────────────────────
+\begin{frame}{Regiones de análisis}
+\begin{columns}[T]
+\column{0.60\textwidth}
+\fullimg{../displays/regions_map.png}
+
+\column{0.38\textwidth}
+\vspace{8pt}
+\textbf{Datos:} CMEMS 0.25° mensual\\1993--2024 (384 meses)\\[10pt]
+\textbf{4 regiones clave:}
+\begin{itemize}
+  \item {\color{red}\textbf{Índico Tropical}}\\20°S--20°N, 40°E--100°E
+  \item {\color{violet}\textbf{Bahía de Bengala}}\\10°N--25°N, 80°E--100°E
+  \item {\color{orange}\textbf{W. Pacific Warm Pool}}\\10°S--10°N, 130°E--180°E
+  \item {\color{teal}\textbf{Amazon Plume}}\\5°S--10°N, 55°W--30°W
+\end{itemize}
+\end{columns}
+\end{frame}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+\sectionframe{2. Datos y Métodos}
+
+%% ── Productos CMEMS ──────────────────────────────────────────────────────────
+\begin{frame}{Productos CMEMS utilizados}
+\begin{center}
+\begin{tabular}{lllp{4.2cm}}
+\toprule
+\textbf{Dataset ID} & \textbf{Resolución} & \textbf{Período} & \textbf{Variables} \\
+\midrule
+\texttt{...0.25deg\_P1M-m} & 0.25° mensual (LR) & 1993--2025 & thetao\_glor, so\_glor, mlotst\_glor \\[4pt]
+\texttt{...0.083deg\_P1M-m} & 0.083° mensual (HR) & 1993--2025 & thetao, so, mlotst \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{10pt}
+\begin{itemize}
+  \item \textbf{MLD}: usamos el MLD pre-computado de CMEMS (\texttt{mlotst\_glor}) -- no lo recalculamos
+  \item \textbf{ILD}: calculado con 6 configuraciones propias sobre los perfiles de temperatura
+  \item \textbf{Grillas verticales:} LR tiene 74 niveles (0.5--5698 m); HR tiene 32 niveles (0.5--541 m)\\
+        En los primeros 300 m relevantes para la BLD: LR 34 niveles, HR 28 niveles
+\end{itemize}
+\end{frame}
+
+%% ── Grillas verticales ───────────────────────────────────────────────────────
+\begin{frame}{Grillas verticales: LR vs HR (0--300 m)}
+\begin{center}
+\fullimg{../displays/vertical_grid_comparison.png}
+\end{center}
+\captext{Espaciado entre niveles en función de la profundidad. LR tiene más niveles que HR en los primeros 300 m.}
+\end{frame}
+
+%% ── 6 métodos ────────────────────────────────────────────────────────────────
+\begin{frame}{6 métodos de detección de ILD}
+\begin{center}
+{\small
+\begin{tabular}{@{} l l p{5.8cm} p{2.8cm} @{}}
+\toprule
+\textbf{N} & \textbf{Familia} & \textbf{Definición} & \textbf{Umbral} \\
+\midrule
+1 & Gradiente & Primera $z$ donde $\partial T/\partial z \leq$ umbral (desde 5\,m) & $-0.015$\,°C/m \\[2pt]
+2 & Gradiente & ídem & $-0.025$\,°C/m \\[2pt]
+3 & Gradiente & ídem & $-0.1$\,°C/m \\[2pt]
+4 & Diferencia & Primera $z$ donde $T(z) < T(10\,\text{m}) - \Delta T$ & $\Delta T = 0.2$\,°C \\[2pt]
+5 & Diferencia & ídem & $\Delta T = 0.5$\,°C \\[2pt]
+6 & Diferencia & ídem & $\Delta T = 0.8$\,°C \\
+\bottomrule
+\end{tabular}
+}
+\end{center}
+\vspace{6pt}
+\[ \text{BLD} = \text{ILD} - \text{MLD} \quad \text{para los 6 métodos} \]
+\captext{Objetivo: evaluar cuánto cambian los resultados según el método elegido.}
+\end{frame}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+\sectionframe{3. Estructura Vertical -- Perfiles Individuales}
+
+%% ── 6 métodos en un perfil ───────────────────────────────────────────────────
+\begin{frame}{Los 6 métodos sobre un mismo perfil}
+\begin{center}
+\fullimg{../displays/sensitivity_one_point_2023-12-30_lat-10.0_lon55.0.png}
+\end{center}
+\captext{Lat $-10^{\circ}$, lon $55^{\circ}$, Dic 2023. Cada método detecta una ILD diferente, ilustrando la sensibilidad al umbral.}
+\end{frame}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+\sectionframe{4. Sensibilidad al Método de Detección}
+
+%% ── Ensemble maps ────────────────────────────────────────────────────────────
+\begin{frame}{Mapa ensemble: media, spread y acuerdo entre métodos}
+\begin{center}
+\fullimg{../displays/sensitivity_ensemble_maps.png}
+\end{center}
+\captext{Mayor spread en el W. Pacific Warm Pool y Bahía de Bengala. Mayor acuerdo en el Atlántico tropical.}
+\end{frame}
+
+%% ── 6 configs side by side ───────────────────────────────────────────────────
+\begin{frame}{BLD media anual: los 6 métodos comparados}
+\begin{center}
+\fullimg{../displays/summary_sensitivity_comparison.png}
+\end{center}
+\captext{Métodos de diferencia detectan Barrier Layer en $\sim$50\% del océano; los de gradiente en 24--35\%.}
+\end{frame}
+
+%% ── Stats table ──────────────────────────────────────────────────────────────
+\begin{frame}{Estadísticas globales (1993--2024)}
+\begin{columns}[T]
+\column{0.50\textwidth}
+\fullimg{../displays/sensitivity_stats_table.png}
+
+\column{0.48\textwidth}
+\vspace{8pt}
+\begin{itemize}
+  \item BLD media global: 12.7 m (grad $-0.015$) a 40.1 m (diff 0.8°C) -- factor $\sim3\times$
+  \item Cobertura: 24--35\% (gradiente) vs 48--50\% (diferencia)
+  \item Amplitud estacional: 10--21 m según método
+\end{itemize}
+\end{columns}
+\end{frame}
+
+%% ── Global time series ───────────────────────────────────────────────────────
+\begin{frame}{Serie temporal global de BLD -- los 6 métodos (1993--2024)}
+\begin{center}
+\fullimg{../displays/sensitivity_global_timeseries.png}
+\end{center}
+\captext{Todos los métodos muestran tendencia positiva consistente desde $\sim$2008. La señal no depende de la elección metodológica.}
+\end{frame}
+
+%% ── Regional time series ─────────────────────────────────────────────────────
+\begin{frame}{Series temporales regionales -- los 6 métodos}
+\begin{center}
+\fullimg{../displays/sensitivity_regional_timeseries.png}
+\end{center}
+\captext{El W. Pacific Warm Pool muestra la mayor sensibilidad al método. La Bahía de Bengala tiene el ciclo estacional más pronunciado.}
+\end{frame}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+\sectionframe{5. Climatología Estacional}
+
+%% ── Seasonal 4x6 ─────────────────────────────────────────────────────────────
+\begin{frame}{BLD por estación: 4 estaciones $\times$ 6 métodos}
+\begin{center}
+\fullimg{../displays/monthly_clim_seasonal_comparison.png}
+\end{center}
+\captext{Pico de BLD en Sep--Oct en la mayoría de los métodos. El hemisferio sur muestra la señal estacional opuesta.}
+\end{frame}
+
+%% ── Clim Diff 0.2 ────────────────────────────────────────────────────────────
+\begin{frame}{Climatología mensual -- Diferencia $\Delta T = 0.2$°C}
+\begin{center}
+\fullimg{../displays/monthly_clim_difference_02.png}
+\end{center}
+\captext{12 meses, 1993--2024. Escala compartida con el método de gradiente para comparación directa.}
+\end{frame}
+
+%% ── Clim Grad -0.025 ─────────────────────────────────────────────────────────
+\begin{frame}{Climatología mensual -- Gradiente $-0.025$°C/m}
+\begin{center}
+\fullimg{../displays/monthly_clim_gradient_025.png}
+\end{center}
+\captext{12 meses, 1993--2024. Misma escala que la diapositiva anterior (vmax = 145.3 m).}
+\end{frame}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+\sectionframe{6. Comparación LR 0.25° vs HR 0.083°}
+
+%% ── Annual mean maps ─────────────────────────────────────────────────────────
+\begin{frame}{Mapas anuales: LR, HR y diferencia (2024)}
+\begin{center}
+\fullimg{../displays/compare_lr_hr_annual_mean.png}
+\end{center}
+\captext{Media anual 2024. La diferencia LR--HR es pequeña en términos absolutos. Mayor desacuerdo donde hay alta variabilidad local.}
+\end{frame}
+
+%% ── Zoom regions ─────────────────────────────────────────────────────────────
+\begin{frame}{Zoom en regiones clave -- diferencias LR vs HR}
+\begin{center}
+\fullimg{../displays/compare_lr_hr_zoom_regions.png}
+\end{center}
+\captext{La estructura espacial de la BLD se reproduce bien en ambas resoluciones.}
+\end{frame}
+
+%% ── Monthly stats ────────────────────────────────────────────────────────────
+\begin{frame}{Series temporales mensuales de BLD: LR vs HR (2024)}
+\begin{center}
+\fullimg{../displays/compare_lr_hr_monthly_stats.png}
+\end{center}
+\captext{BLD media global mensual (arriba), diferencia HR--LR (abajo izq.) y cobertura de detección (abajo der.).}
+\end{frame}
+
+%% ── T/S scatter ──────────────────────────────────────────────────────────────
+\begin{frame}{Acuerdo en perfiles T/S: scatter LR vs HR}
+\begin{center}
+\fullimg{../displays/scatter_profiles_lr_hr.png}
+\end{center}
+\captext{Columnas: Amazon Plume, Bahía de Bengala, W. Pacific Warm Pool. Filas: T (°C) y S (PSU). Cada punto = un par (mes, profundidad); color = profundidad.}
+\end{frame}
+
+%% ── BLD scatter ──────────────────────────────────────────────────────────────
+\begin{frame}{Scatter global MLD/ILD/BLD: LR vs HR por cuenca (2024)}
+\begin{center}
+\fullimg{../displays/scatter_bld_lr_hr.png}
+\end{center}
+\captext{Mejor acuerdo en el Índico (R=0.88). Mayor dispersión en el Océano Austral (R=0.57). Sesgo MLD global: +3.0 m.}
+\end{frame}
+
+%% ── Resolvability Amazon Plume ────────────────────────────────────────────────
+\begin{frame}{Resolvabilidad de diferencias ILD -- Amazon Plume}
+\begin{center}
+\fullimg{../displays/resolvability_amazon_plume.png}
+\end{center}
+\captext{Ratio = $\Delta$ILD / espaciado máximo de grilla. Ratio > 1 indica diferencia físicamente resolvable (no cuantización de grilla).}
+\end{frame}
+
+%% ── Resolvability Bay of Bengal ──────────────────────────────────────────────
+\begin{frame}{Resolvabilidad de diferencias ILD -- Bahía de Bengala}
+\begin{center}
+\fullimg{../displays/resolvability_bay_of_bengal.png}
+\end{center}
+\captext{Muchas diferencias ILD entre LR y HR son cuantización de grilla, no señal física real.}
+\end{frame}
+
+%% ── Profiles with uncertainty Amazon ─────────────────────────────────────────
+\begin{frame}{Perfiles LR vs HR con incertidumbre de grilla -- Amazon Plume}
+\begin{center}
+\fullimg{../displays/compare_profiles_amazon_plume_gradient_-0.1_with_uncertainty.png}
+\end{center}
+\captext{Bandas grises = $\pm\tfrac{1}{2}$ espaciado de grilla. Cuando se solapan, la diferencia ILD entre LR y HR no es resolvable.}
+\end{frame}
+
+%% ── Profiles with uncertainty Bay of Bengal ──────────────────────────────────
+\begin{frame}{Perfiles LR vs HR con incertidumbre de grilla -- Bahía de Bengala}
+\begin{center}
+\fullimg{../displays/compare_profiles_bay_of_bengal_gradient_-0.1_with_uncertainty.png}
+\end{center}
+\captext{Bahía de Bengala: mayor acuerdo en meses de post-monzón. Diferencias resolvables principalmente en abr--may y ago.}
+\end{frame}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+\sectionframe{7. Tendencias 1993--2024}
+
+%% ── Trend table ──────────────────────────────────────────────────────────────
+\begin{frame}{Tendencia global de BLD: los 6 métodos}
+\begin{center}
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Método} & \textbf{Tendencia} & \textbf{R} & \textbf{p-valor} & \textbf{Sig.} \\
+                & (m/década)         &            &                  &               \\
+\midrule
+Gradiente $-0.015$°C/m        & +0.80 & 0.618 & 0.0002   & ** \\
+\rowcolor{iceblue!60}
+Gradiente $-0.025$°C/m        & +1.26 & 0.709 & $<$0.0001 & ** \\
+Gradiente $-0.1$°C/m          & +1.75 & 0.705 & $<$0.0001 & ** \\
+\rowcolor{iceblue!60}
+Diff $\Delta T = 0.2$°C       & +0.43 & 0.278 & 0.123    & -- \\
+Diff $\Delta T = 0.5$°C       & +1.08 & 0.521 & 0.002    & ** \\
+Diff $\Delta T = 0.8$°C       & +1.31 & 0.574 & 0.001    & ** \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{4pt}
+\captext{5 de 6 métodos: tendencia positiva significativa $\to$ señal física robusta, no artefacto metodológico.\\Resaltados en azul: métodos de referencia usados en las siguientes diapositivas.}
+\end{frame}
+
+%% ── Trend map Diff 0.2 all ────────────────────────────────────────────────────
+\begin{frame}{Tendencia BLD -- Diferencia $\Delta T = 0.2$°C (todas las áreas)}
+\begin{center}
+\fullimg{../displays/bld_trend_map_difference_02_all.png}
+\end{center}
+\captext{Tendencia por píxel 1993--2024 (m/década). Escala: $\pm$12 m/década.}
+\end{frame}
+
+%% ── Trend map Diff 0.2 sig ────────────────────────────────────────────────────
+\begin{frame}{Tendencia BLD -- Diferencia $\Delta T = 0.2$°C (solo p < 0.05)}
+\begin{center}
+\fullimg{../displays/bld_trend_map_difference_02_sig.png}
+\end{center}
+\captext{Solo píxeles con tendencia estadísticamente significativa (p < 0.05). El 19.9\% del océano; 90\% de ellos positivos.}
+\end{frame}
+
+%% ── Trend map Grad -0.025 all ─────────────────────────────────────────────────
+\begin{frame}{Tendencia BLD -- Gradiente $-0.025$°C/m (todas las áreas)}
+\begin{center}
+\fullimg{../displays/bld_trend_map_gradient_025_all.png}
+\end{center}
+\captext{Tendencia por píxel 1993--2024 (m/década). Escala: $\pm$8 m/década.}
+\end{frame}
+
+%% ── Trend map Grad -0.025 sig ─────────────────────────────────────────────────
+\begin{frame}{Tendencia BLD -- Gradiente $-0.025$°C/m (solo p < 0.05)}
+\begin{center}
+\fullimg{../displays/bld_trend_map_gradient_025_sig.png}
+\end{center}
+\captext{Solo píxeles con tendencia estadísticamente significativa (p < 0.05).}
+\end{frame}
+
+%% ── Regional trends ──────────────────────────────────────────────────────────
+\begin{frame}{Tendencias regionales -- Gradiente $-0.025$°C/m (1993--2024)}
+\begin{center}
+\fullimg{../displays/bld_trend_regions.png}
+\end{center}
+\captext{Mayor tendencia: W. Pacific Warm Pool (+6.9 m/déc.). Señal más limpia: Índico Tropical (R=0.77). Bahía de Bengala: no significativa.}
+\end{frame}
+
+%% ── Trend ensemble ───────────────────────────────────────────────────────────
+\begin{frame}{Spread del trend entre los 6 métodos}
+\begin{center}
+\fullimg{../displays/bld_trend_ensemble.png}
+\end{center}
+\captext{La incertidumbre en la magnitud del trend es $\sim2\times$ según el método. La dirección (positiva) es consistente en todos.}
+\end{frame}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+\sectionframe{8. Variabilidad Interanual y Huella de ENSO}
+
+%% ── Variability maps ─────────────────────────────────────────────────────────
+\begin{frame}{Mapas de variabilidad temporal (1993--2024)}
+\begin{center}
+\fullimg{../displays/bld_variability_maps.png}
+\end{center}
+\captext{La variabilidad estacional (amplitud $\sim$29 m) domina sobre la interanual (std $\sim$6 m). Ratio $\approx5:1$ globalmente.}
+\end{frame}
+
+%% ── Anomaly maps ─────────────────────────────────────────────────────────────
+\begin{frame}{Anomalías anuales de BLD (1993--2024)}
+\begin{center}
+\fullimg{../displays/bld_anomaly_maps.png}
+\end{center}
+\captext{Anomalías respecto a la media 1993--2024. Años extremos: 1998 (El Niño fuerte) y 2022 (La Niña 2021--23).}
+\end{frame}
+
+%% ── ENSO composite ───────────────────────────────────────────────────────────
+\begin{frame}{Compuesto ENSO: anomalía de BLD en años Niño y Niña}
+\begin{center}
+\fullimg{../displays/enso_composite_gradient_025.png}
+\end{center}
+\captext{Método: gradiente $-0.025$°C/m. La Niña aumenta la BLD en el Pacífico occidental; El Niño la reduce. Der: diferencia La Niña -- El Niño.}
+\end{frame}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+\sectionframe{9. Síntesis}
+
+%% ── Key findings ─────────────────────────────────────────────────────────────
+\begin{frame}{Hallazgos principales}
+\begin{itemize}
+  \item Las diferencias LR vs HR en perfiles T/S son mínimas (R > 0.997 para T, R > 0.978 para S)
+  \item La grilla vertical LR es más fina que HR debajo de 30 m -- la resolución vertical no explica las diferencias de BLD
+  \item La mayoría de las diferencias ILD entre LR y HR son cuantización de grilla, no señal física
+  \item La BLD global aumentó +0.8 a +1.75 m/década (1993--2024), significativo en 5/6 métodos
+  \item La señal más fuerte: W. Pacific Warm Pool (+6.9 m/década) e Índico Tropical (+2.4 m/década)
+  \item La variabilidad estacional ($\sim$29 m de amplitud) supera $5\times$ a la interanual ($\sim$6 m)
+  \item Huella de ENSO clara: mínimo en 1998 (El Niño), máximo en 2022 (La Niña)
+\end{itemize}
+\end{frame}
+
+%% ── Next steps ───────────────────────────────────────────────────────────────
+\begin{frame}{Próximos pasos}
+\begin{itemize}
+  \item Extender el análisis HR a años previos (disponible 1993--2024)
+  \item Vincular la BLD con eventos de Marine Heatwaves (MHW)
+  \item Analizar la conexión BLD--ENSO en profundidad (índices ONI, PDO)
+  \item Comparar con datos observacionales (Argo floats)
+  \item Definir el método óptimo para publicación basado en sensibilidad y resolvabilidad
+\end{itemize}
+\end{frame}
+
+\end{document}

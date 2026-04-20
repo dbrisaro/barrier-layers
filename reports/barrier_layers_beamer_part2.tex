@@ -1,0 +1,256 @@
+%% Barrier Layer Depth -- Presentación Parte 2
+%% Compile: pdflatex barrier_layers_beamer_part2.tex
+\documentclass[aspectratio=169, 12pt]{beamer}
+
+%% ── Encoding & language ───────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+
+%% ── Packages ──────────────────────────────────────────────────────────────────
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{colortbl}
+
+%% ── Colors ────────────────────────────────────────────────────────────────────
+\definecolor{oceanblue}{HTML}{065A82}
+\definecolor{deepnavy}{HTML}{1C2951}
+\definecolor{iceblue}{HTML}{CADCFC}
+\definecolor{teal}{HTML}{1C7293}
+\definecolor{lightgray}{HTML}{F4F4F4}
+
+%% ── Theme ─────────────────────────────────────────────────────────────────────
+\usetheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{%
+  \hfill\usebeamerfont{footline}\insertframenumber\,/\,\inserttotalframenumber\hspace{4pt}\vspace{4pt}%
+}
+
+\setbeamercolor{frametitle}{fg=white, bg=oceanblue}
+\setbeamerfont{frametitle}{size=\large, series=\bfseries}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{subtitle}{fg=iceblue}
+\setbeamercolor{author}{fg=iceblue}
+\setbeamercolor{date}{fg=iceblue}
+\setbeamercolor{normal text}{fg=black}
+\setbeamercolor{structure}{fg=oceanblue}
+\setbeamercolor{block title}{fg=white, bg=oceanblue}
+\setbeamercolor{block body}{bg=lightgray}
+\setbeamertemplate{itemize item}{\color{oceanblue}\textbullet}
+\setbeamertemplate{itemize subitem}{\color{teal}--}
+
+%% ── Helper: section divider frame ─────────────────────────────────────────────
+\newcommand{\sectionframe}[1]{%
+  \begin{frame}[plain, noframenumbering]
+    \begin{tikzpicture}[remember picture, overlay]
+      \fill[deepnavy] (current page.south west) rectangle (current page.north east);
+      \node[text=white, font=\LARGE\bfseries, align=center]
+        at (current page.center) {#1};
+    \end{tikzpicture}
+  \end{frame}
+}
+
+%% ── Helper: full-slide image ──────────────────────────────────────────────────
+\newcommand{\fullimg}[1]{%
+  \includegraphics[width=\textwidth, height=0.73\textheight, keepaspectratio]{#1}%
+}
+
+%% ── Caption style ─────────────────────────────────────────────────────────────
+\newcommand{\captext}[1]{%
+  \vskip2pt
+  {\tiny\color{gray}\raggedright #1\par}%
+}
+
+%% ── Title info ────────────────────────────────────────────────────────────────
+\title{Barrier Layer Depth: Análisis Global}
+\subtitle{Sensibilidad al método de detección de ILD\\Parte 2 -- Resultados}
+\date{2026}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+\begin{document}
+
+%% ── TITLE ─────────────────────────────────────────────────────────────────────
+{
+\setbeamercolor{background canvas}{bg=deepnavy}
+\begin{frame}[plain]
+  \vfill
+  \centering
+  {\color{white}\Large\textbf{Barrier Layer Depth: Análisis Global}}\\[10pt]
+  {\color{iceblue}\normalsize Sensibilidad al método de detección de ILD}\\[6pt]
+  {\color{iceblue}\normalsize Parte 2 -- Resultados y Discusión}\\[30pt]
+  {\color{iceblue}\small 2026}
+  \vfill
+\end{frame}
+}
+
+%% ── Qué es la Barrier Layer ──────────────────────────────────────────────────
+\begin{frame}{¿Qué es la Barrier Layer?}
+\begin{columns}[c]
+
+\column{0.50\textwidth}
+\centering
+\begin{tikzpicture}[scale=1.05]
+  %% ── ocean column (x: 0..2, y: 0..6) ─────────────────────
+  \fill[cyan!10]      (0,5.4) rectangle (2.0,6.0);
+  \fill[cyan!25]      (0,3.6) rectangle (2.0,5.4);
+  \fill[teal!45]      (0,2.0) rectangle (2.0,3.6);
+  \fill[blue!60]      (0,0.0) rectangle (2.0,2.0);
+  %% ── boundaries ───────────────────────────────────────────
+  \draw[white, line width=1.2pt] (0,5.4) -- (2.0,5.4);
+  \draw[white, dashed, line width=1pt] (0,3.6) -- (2.0,3.6);
+  \draw[white, line width=1.2pt] (0,2.0) -- (2.0,2.0);
+  \draw[gray!40, thin] (0,0) rectangle (2.0,6.0);
+  %% ── depth brackets (left) ────────────────────────────────
+  \draw[<->, thick, black!50]
+    (-0.25,3.6) -- (-0.25,5.4) node[midway,left,font=\scriptsize]{MLD};
+  \draw[<->, thick, black!40]
+    (-0.25,2.0) -- (-0.25,5.4) node[midway,left=3pt,font=\scriptsize,xshift=-4pt]{ILD};
+  \draw[<->, very thick, teal]
+    (-0.75,2.0) -- (-0.75,3.6)
+    node[midway,left,font=\small\bfseries,color=teal]{BLD};
+  %% ── right labels ─────────────────────────────────────────
+  \node[right,font=\small\itshape]             at (2.2,5.70){Superficie};
+  \node[right,font=\small\bfseries]            at (2.2,4.60){Capa de Mezcla};
+  \node[right,font=\scriptsize,color=gray]     at (2.2,4.30){isohalina e isotérmica};
+  \node[right,font=\small\bfseries,color=teal] at (2.2,2.90){Barrier Layer};
+  \node[right,font=\scriptsize,color=gray]     at (2.2,2.60){fresca y cálida};
+  \node[right,font=\scriptsize,color=gray]     at (2.2,2.30){estratif.\ salina};
+  \node[right,font=\small\bfseries]            at (2.2,1.00){Termoclina};
+\end{tikzpicture}
+
+\column{0.47\textwidth}
+\begin{block}{Definición}
+\[ \text{BLD} = \text{ILD} - \text{MLD} \]
+\end{block}
+\vspace{6pt}
+{\small
+\begin{itemize}
+  \item \textbf{BLD $>$ 0}: Barrier Layer presente
+  \item \textbf{BLD $=$ 0}: ILD coincide con MLD
+\end{itemize}
+\vspace{8pt}
+La BLD \textbf{inhibe el intercambio de calor} entre la superficie y la termoclina, modulando la SST y el acoplamiento océano-atmósfera.
+}
+\end{columns}
+\end{frame}
+
+%% ── Productos CMEMS ──────────────────────────────────────────────────────────
+\begin{frame}{Productos CMEMS utilizados}
+\begin{center}
+{\small
+\begin{tabular}{@{} l l l p{3.8cm} @{}}
+\toprule
+\textbf{Dataset} & \textbf{Resolución} & \textbf{Período} & \textbf{Variables clave} \\
+\midrule
+\texttt{...0.25deg\_P1M-m} & 0.25° mensual \textbf{(LR)} & 1993--2024 &
+  thetao\_glor, so\_glor, mlotst\_glor \\[6pt]
+\texttt{...0.083deg\_P1M-m} & 0.083° mensual \textbf{(HR)} & 1993--2024 &
+  thetao, so, mlotst \\
+\bottomrule
+\end{tabular}
+}
+\end{center}
+\vspace{10pt}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\begin{block}{MLD}
+Usamos el MLD pre-computado de CMEMS (\texttt{mlotst}); no se recalcula.
+\end{block}
+
+\column{0.48\textwidth}
+\begin{block}{ILD}
+Calculada con 6 configuraciones propias sobre los perfiles de temperatura.
+\end{block}
+\end{columns}
+\end{frame}
+
+%% ── Grillas verticales (columna completa + zoom 0-300 m) ─────────────────────
+\begin{frame}{Grillas verticales: LR vs HR}
+\begin{center}
+\fullimg{../displays/vertical_grid_comparison.png}
+\end{center}
+\captext{%
+  Izq.: columna completa -- LR cubre hasta 5902 m (75 niveles); HR hasta 5728 m (50 niveles).
+  Der.: zoom 0--300 m -- en el rango relevante para la BLD, LR tiene 34 niveles y HR 28.
+  El espaciado superficial es prácticamente idéntico en ambas resoluciones.
+}
+\end{frame}
+
+%% ── 6 métodos ────────────────────────────────────────────────────────────────
+\begin{frame}{6 métodos de detección de ILD}
+\begin{center}
+{\small
+\begin{tabular}{@{} c l p{6.5cm} p{2.5cm} @{}}
+\toprule
+\textbf{N} & \textbf{Familia} & \textbf{Definición} & \textbf{Umbral} \\
+\midrule
+1 & Gradiente & Primera $z > 5\,\text{m}$ donde $\partial T/\partial z \leq$ umbral
+  & $-0.015$\,°C/m \\[3pt]
+2 & Gradiente & ídem & $-0.025$\,°C/m \\[3pt]
+3 & Gradiente & ídem & $-0.1$\,°C/m \\[3pt]
+4 & Diferencia & Primera $z$ donde $T(z) < T(10\,\text{m}) - \Delta T$
+  & $\Delta T = 0.2$\,°C \\[3pt]
+5 & Diferencia & ídem & $\Delta T = 0.5$\,°C \\[3pt]
+6 & Diferencia & ídem & $\Delta T = 0.8$\,°C \\
+\bottomrule
+\end{tabular}
+}
+\end{center}
+\vspace{4pt}
+\[ \text{BLD} = \text{ILD} - \text{MLD} \quad \text{(calculado para los 6 métodos)} \]
+\captext{El método de gradiente es más sensible a termoclinas fuertes; el de diferencia es más robusto en perfiles ruidosos.}
+\end{frame}
+
+%% ── Los 6 métodos sobre un perfil ────────────────────────────────────────────
+\begin{frame}{Los 6 métodos sobre un mismo perfil}
+\begin{center}
+\fullimg{../displays/sensitivity_one_point_2023-12-30_lat-10.0_lon55.0.png}
+\end{center}
+\captext{Lat $-10^{\circ}$, Lon $55^{\circ}$, Dic 2023. Cada método detecta una ILD diferente, ilustrando la sensibilidad al umbral elegido.}
+\end{frame}
+
+%% ── BLD media anual: 6 métodos ───────────────────────────────────────────────
+\begin{frame}{BLD media anual: los 6 métodos comparados}
+\begin{center}
+\fullimg{../displays/summary_sensitivity_comparison.png}
+\end{center}
+\captext{Media anual 1993--2024. Los métodos de diferencia detectan BLD en $\sim$50\% del océano global; los de gradiente en 24--35\%. La escala de valores es consistentemente mayor en los métodos de diferencia.}
+\end{frame}
+
+%% ── Mapa de acuerdo entre métodos ────────────────────────────────────────────
+\begin{frame}{Acuerdo entre los 6 métodos de detección de BLD}
+\begin{center}
+\fullimg{../displays/method_agreement_map.png}
+\end{center}
+\captext{Average fraction of methods detecting BLD $>$ 0 (1993--2024).
+  High agreement ($>$95\%) in the W.\ Pacific Warm Pool and Bay of Bengal;
+  low agreement in the Southern Ocean. The Tropical Atlantic (Amazon Plume region) shows the widest intra-regional spread.
+  Green box: Northern Argentine Continental Shelf.}
+\end{frame}
+
+%% ── Estadísticas globales ─────────────────────────────────────────────────────
+\begin{frame}{Estadísticas globales: sensibilidad al método (1993–2024)}
+\begin{center}
+\fullimg{../displays/sensitivity_stats_table.png}
+\end{center}
+\vspace{2pt}
+\begin{columns}[T]
+\column{0.32\textwidth}
+{\small\color{oceanblue}\textbf{BLD media global}}\\[3pt]
+{\small 12.7 m \textit{(grad $-$0.015)} a 40.1 m \textit{(diff 0.8°C)} — factor ${\sim}3\times$}
+
+\column{0.32\textwidth}
+{\small\color{oceanblue}\textbf{Cobertura oceánica}}\\[3pt]
+{\small 24--35\% métodos gradiente\\48--50\% métodos diferencia}
+
+\column{0.32\textwidth}
+{\small\color{oceanblue}\textbf{Amplitud estacional}}\\[3pt]
+{\small 10--21 m según método}
+\end{columns}
+\end{frame}
+
+\end{document}

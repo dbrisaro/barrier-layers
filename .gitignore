@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environments
+.conda/
+.conda_arm/
+.env
+.venv/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.synctex.gz
+
+# Data (large files — never commit)
+data/
+*.nc
+*.zarr
+
+# Figures (regenerable from scripts)
+displays/
+
+# Literature PDFs
+docs/
+
+# Logs
+logs/
+
+# LaTeX compiled output (keep .tex, ignore built files)
+reports/*.pdf
+reports/*.aux
+reports/*.log
+reports/*.nav
+reports/*.out
+reports/*.snm
+reports/*.toc
+reports/*.synctex.gz
+
+# Old/archive scripts
+scripts/archive/
+
+# macOS
+.DS_Store
+.AppleDouble
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
