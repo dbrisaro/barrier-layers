@@ -1,0 +1,21 @@
+name: barrier-layers
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy
+  - xarray
+  - zarr
+  - dask
+  - scipy
+  - matplotlib
+  - cartopy
+  - pyshp
+  - gsw
+  - jupyterlab
+  - ipympl
+  - ipywidgets
+  - pip
+  - pip:
+    - copernicusmarine

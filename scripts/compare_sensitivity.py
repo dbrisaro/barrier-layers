@@ -120,18 +120,13 @@ for name, label, _ in CONFIGS:
         regional_ts[name][rname] = ts.values
     print(f"  {name} done")
 
-# ── Figure 1: Ensemble maps ───────────────────────────────────────────────────
+# ── Figure 1: Mean BLD / Spread / Agreement  (3 panels) ──────────────────────
 print("\nPlotting ensemble maps ...")
 
 proj = ccrs.Robinson()
 pc   = ccrs.PlateCarree()
 
-fig = plt.figure(figsize=(18, 10))
-fig.patch.set_facecolor("white")
-gs  = gridspec.GridSpec(2, 3, hspace=0.12, wspace=0.08,
-                        left=0.02, right=0.98, top=0.93, bottom=0.06)
-
-def add_map(ax, data, vmin, vmax, cmap, title, cbar_label, norm=None):
+def add_map(ax, fig, data, vmin, vmax, cmap, title, cbar_label, norm=None):
     if norm is not None:
         img = ax.pcolormesh(lon, lat, data, norm=norm,
                             cmap=cmap, transform=pc, rasterized=True)
@@ -148,7 +143,7 @@ def add_map(ax, data, vmin, vmax, cmap, title, cbar_label, norm=None):
     cb.ax.tick_params(labelsize=7)
 
 
-def add_bld_map(ax, data, vmax, title):
+def add_bld_map(ax, fig, data, vmax, title):
     """BLD map: white = 0 (no barrier layer), blues = positive BLD."""
     data_m = np.ma.masked_where(data <= 0, data)
     img = ax.pcolormesh(lon, lat, data_m, vmin=0, vmax=vmax,
@@ -162,30 +157,27 @@ def add_bld_map(ax, data, vmax, title):
     cb.set_label("BLD (m)", fontsize=8)
     cb.ax.tick_params(labelsize=7)
 
-# Row 0: ensemble mean + spread
+fig1, axes1 = plt.subplots(1, 3, figsize=(18, 5),
+                            subplot_kw={"projection": proj})
+fig1.patch.set_facecolor("white")
+fig1.subplots_adjust(left=0.02, right=0.98, top=0.88, bottom=0.08,
+                     wspace=0.08)
+
 vmax_mean = max(20, float(np.nanpercentile(ens_mean[ens_mean > 0], 95))) if np.any(ens_mean > 0) else 50
-ax0 = fig.add_subplot(gs[0, 0], projection=proj)
-add_bld_map(ax0, ens_mean, vmax_mean, "Ensemble mean BLD")
+add_bld_map(axes1[0], fig1, ens_mean, vmax_mean, "A   Mean BLD")
 
 vmax_std = float(np.nanpercentile(ens_std[np.isfinite(ens_std)], 95))
-ax1 = fig.add_subplot(gs[0, 1], projection=proj)
-add_map(ax1, ens_std, 0, vmax_std, "YlOrRd", "Ensemble spread  σ(BLD)", "σ (m)")
+add_map(axes1[1], fig1, ens_std, 0, vmax_std, "YlOrRd",
+        "B   Ensemble spread  σ(BLD)", "σ (m)")
 
-ax2 = fig.add_subplot(gs[0, 2], projection=proj)
-add_map(ax2, detect_agree, 0, 100, "RdYlGn", "Detection agreement\n(% configs with BLD>0 most of the time)", "%")
+add_map(axes1[2], fig1, detect_agree, 0, 100, "RdYlGn",
+        "C   Detection agreement", "% configs with BLD > 0")
 
-# Row 1: individual config mean maps (first 3)
-for i, (name, label, _) in enumerate(CONFIGS[:3]):
-    ax = fig.add_subplot(gs[1, i], projection=proj)
-    vmax_i = max(20, float(np.nanpercentile(
-        mean_maps[name][mean_maps[name] > 0], 95
-    ))) if np.any(mean_maps[name] > 0) else 50
-    add_bld_map(ax, mean_maps[name], vmax_i, label)
-
-fig.suptitle("Sensitivity analysis — ensemble statistics  (1993–2024)", fontsize=13, y=0.97)
+fig1.suptitle("Sensitivity analysis — mean BLD, spread and method agreement  (1993–2024)",
+              fontsize=12, y=0.97)
 out1 = OUT_DIR / "sensitivity_ensemble_maps.png"
-fig.savefig(out1, dpi=200, bbox_inches="tight")
-plt.close(fig)
+fig1.savefig(out1, dpi=200, bbox_inches="tight")
+plt.close(fig1)
 print(f"Saved: {out1.name}")
 
 # ── Figure 2: Regional time series ───────────────────────────────────────────

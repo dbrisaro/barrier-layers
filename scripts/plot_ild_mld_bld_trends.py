@@ -243,13 +243,19 @@ print("\n=== Figure 3: ILD trend per method (2×3) ===")
 
 ild_trends  = []
 ild_pvals   = []
+bld_trends  = []
+bld_pvals   = []
 
 for cname, clabel in CONFIGS:
     print(f"  {cname}:")
-    ann = load_annual_var(cname, "ild", positive_only=True)
-    s_yr, pv = vect_linregress(ann.astype(np.float64), x)
-    ild_trends.append(s_yr * 10.0)
-    ild_pvals.append(pv)
+    ann_ild_c = load_annual_var(cname, "ild", positive_only=True)
+    ann_bld_c = load_annual_var(cname, "bld", positive_only=True)
+    s_ild, pv_ild = vect_linregress(ann_ild_c.astype(np.float64), x)
+    s_bld, pv_bld = vect_linregress(ann_bld_c.astype(np.float64), x)
+    ild_trends.append(s_ild * 10.0)
+    ild_pvals.append(pv_ild)
+    bld_trends.append(s_bld * 10.0)
+    bld_pvals.append(pv_bld)
 
 # shared symmetric colorscale across all 6 methods
 all_vals = np.concatenate([t[np.isfinite(t)] for t in ild_trends])
@@ -336,5 +342,94 @@ out4 = OUT_DIR / "trends_ild_ensemble.png"
 fig4.savefig(out4, dpi=200, bbox_inches="tight")
 plt.close(fig4)
 print(f"  Saved → {out4.name}")
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Figure 5 — BLD trend per method (2×3 panels, shared colorscale)
+# ─────────────────────────────────────────────────────────────────────────────
+print("\n=== Figure 5: BLD trend per method (2×3) ===")
+
+all_bld_vals = np.concatenate([t[np.isfinite(t)] for t in bld_trends])
+vmax_bld_pm  = np.nanpercentile(np.abs(all_bld_vals), 98)
+norm_bld_pm  = mcolors.TwoSlopeNorm(vmin=-vmax_bld_pm, vcenter=0, vmax=vmax_bld_pm)
+
+fig5, axes5 = plt.subplots(2, 3, figsize=(18, 9))
+fig5.patch.set_facecolor("white")
+
+for ax, (cname, clabel), trend, pv in zip(axes5.flat, CONFIGS, bld_trends, bld_pvals):
+    im = ax.pcolormesh(lon, lat, trend, norm=norm_bld_pm, cmap="RdBu_r", rasterized=True)
+    draw_land_coast(ax); style_map(ax)
+    insig_i, insig_j = np.where((pv >= 0.05) & np.isfinite(trend))
+    step = max(1, insig_i.size // 4000)
+    if insig_i.size > 0:
+        ax.scatter(lon[insig_j[::step]], lat[insig_i[::step]],
+                   s=0.4, color="k", alpha=0.3, zorder=4)
+    pct_sig = 100 * np.nanmean((pv < 0.05)[np.isfinite(trend)])
+    pct_pos = 100 * np.nanmean(trend[np.isfinite(trend)] > 0)
+    ax.set_title(clabel, fontsize=8, fontweight="bold")
+    ax.text(0.01, 0.04, f"sig: {pct_sig:.0f}%  pos: {pct_pos:.0f}%",
+            transform=ax.transAxes, fontsize=7, color="#333", zorder=5)
+
+cb5 = fig5.colorbar(
+    plt.cm.ScalarMappable(norm=norm_bld_pm, cmap="RdBu_r"),
+    ax=axes5, location="bottom", shrink=0.45, pad=0.04, aspect=40,
+)
+cb5.set_label("BLD trend (m decade⁻¹)", fontsize=9)
+cb5.ax.tick_params(labelsize=8)
+
+fig5.suptitle("BLD Linear Trend 1993–2024 — one panel per detection method\n"
+              "stippling = p ≥ 0.05  |  shared color scale",
+              fontsize=10, fontweight="bold")
+plt.subplots_adjust(left=0.04, right=0.96, top=0.93, bottom=0.10,
+                    hspace=0.08, wspace=0.04)
+out5 = OUT_DIR / "trends_bld_per_method.png"
+fig5.savefig(out5, dpi=200, bbox_inches="tight")
+plt.close(fig5)
+print(f"  Saved → {out5.name}")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Figure 6 — BLD ensemble: mean trend + spread
+# ─────────────────────────────────────────────────────────────────────────────
+print("\n=== Figure 6: BLD ensemble trend ===")
+
+bld_trend_stack = np.array(bld_trends)           # (6, nlat, nlon)
+bld_trend_mean  = np.nanmean(bld_trend_stack, axis=0)
+bld_trend_std   = np.nanstd( bld_trend_stack, axis=0)
+
+vmax_bm = np.nanpercentile(np.abs(bld_trend_mean[np.isfinite(bld_trend_mean)]), 98)
+vmax_bs = np.nanpercentile(bld_trend_std[np.isfinite(bld_trend_std)], 97)
+norm_bm = mcolors.TwoSlopeNorm(vmin=-vmax_bm, vcenter=0, vmax=vmax_bm)
+cmap_spread = LinearSegmentedColormap.from_list(
+    "spread", ["white", "#fc8d59", "#b30000"], N=256)
+
+fig6, axes6 = plt.subplots(1, 2, figsize=(18, 5))
+fig6.patch.set_facecolor("white")
+
+im6a = axes6[0].pcolormesh(lon, lat, bld_trend_mean, norm=norm_bm,
+                            cmap="RdBu_r", rasterized=True)
+draw_land_coast(axes6[0]); style_map(axes6[0])
+cb6a = fig6.colorbar(im6a, ax=axes6[0], pad=0.02, shrink=0.85, aspect=30)
+cb6a.set_label("Ensemble mean BLD trend (m decade⁻¹)", fontsize=8)
+cb6a.ax.tick_params(labelsize=7)
+axes6[0].set_title("A   BLD ensemble mean trend — all 6 configs",
+                    fontsize=9, fontweight="bold", loc="left")
+axes6[0].set_xlabel("Longitude", fontsize=8); axes6[0].set_ylabel("Latitude", fontsize=8)
+
+im6b = axes6[1].pcolormesh(lon, lat, bld_trend_std, vmin=0, vmax=vmax_bs,
+                            cmap=cmap_spread, rasterized=True)
+draw_land_coast(axes6[1]); style_map(axes6[1])
+cb6b = fig6.colorbar(im6b, ax=axes6[1], pad=0.02, shrink=0.85, aspect=30)
+cb6b.set_label("Ensemble std of BLD trend (m decade⁻¹)", fontsize=8)
+cb6b.ax.tick_params(labelsize=7)
+axes6[1].set_title("B   BLD trend uncertainty — std across 6 methods",
+                    fontsize=9, fontweight="bold", loc="left")
+axes6[1].set_xlabel("Longitude", fontsize=8); axes6[1].set_ylabel("Latitude", fontsize=8)
+
+plt.subplots_adjust(wspace=0.08)
+out6 = OUT_DIR / "trends_bld_ensemble.png"
+fig6.savefig(out6, dpi=200, bbox_inches="tight")
+plt.close(fig6)
+print(f"  Saved → {out6.name}")
+
 
 print("\nDone.")
